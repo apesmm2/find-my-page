@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- Critical for proper phone sizing -->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <title>Middle Pages Calculator</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: #f4f1ea;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #292723;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      /* Handles phone notches / safe areas */
+      padding:
+        max(20px, env(safe-area-inset-top))
+        max(16px, env(safe-area-inset-right))
+        max(20px, env(safe-area-inset-bottom))
+        max(16px, env(safe-area-inset-left));
+    }
+
+    .card {
+      width: 100%;
+      max-width: 480px;
+      background: #fffdf8;
+      border: 1px solid #ddd6c8;
+      border-radius: 20px;
+      padding: clamp(22px, 6vw, 36px);
+      box-shadow: 0 12px 35px rgba(50, 40, 20, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-family: Georgia, serif;
+      font-size: clamp(26px, 7vw, 34px);
+      line-height: 1.1;
+    }
+
+    .subtitle {
+      color: #6d675d;
+      margin: 0 0 28px;
+      line-height: 1.5;
+      font-size: clamp(15px, 4vw, 17px);
+    }
+
+    label {
+      display: block;
+      margin: 20px 0 8px;
+      font-weight: 650;
+      font-size: 16px;
+    }
+
+    input {
+      width: 100%;
+      min-height: 52px;
+      padding: 13px 14px;
+
+      /*
+        16px prevents iPhones from zooming the page
+        when an input is tapped.
+      */
+      font-size: 16px;
+
+      border: 1px solid #bbb3a4;
+      border-radius: 10px;
+      background: white;
+    }
+
+    input:focus {
+      outline: 3px solid rgba(56, 100, 89, 0.15);
+      border-color: #386459;
+    }
+
+    button {
+      width: 100%;
+      min-height: 54px;
+      margin-top: 26px;
+      padding: 14px;
+
+      border: 0;
+      border-radius: 10px;
+
+      background: #386459;
+      color: white;
+
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:hover {
+      background: #2d5148;
+    }
+
+    button:active {
+      transform: scale(0.99);
+    }
+
+    .result {
+      display: none;
+      margin-top: 26px;
+      padding: clamp(18px, 5vw, 24px);
+      text-align: center;
+
+      background: #edf3ef;
+      border-radius: 14px;
+    }
+
+    .range-label {
+      color: #5f6c67;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .range {
+      font-family: Georgia, serif;
+      font-size: clamp(27px, 8vw, 38px);
+      font-weight: bold;
+      color: #28483f;
+      line-height: 1.15;
+    }
+
+    .count {
+      margin-top: 8px;
+      color: #67716d;
+      font-size: 14px;
+    }
+
+    .error {
+      display: none;
+      margin-top: 16px;
+      padding: 12px;
+      color: #a1382b;
+      background: #fff0ed;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    /* PHONE MODE */
+    @media (max-width: 520px) {
+      body {
+        padding: 0;
+        align-items: stretch;
+      }
+
+      .card {
+        max-width: none;
+        min-height: 100vh;
+        min-height: 100dvh;
+
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+
+        padding:
+          max(30px, env(safe-area-inset-top))
+          max(22px, env(safe-area-inset-right))
+          max(30px, env(safe-area-inset-bottom))
+          max(22px, env(safe-area-inset-left));
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+
+    /* Very short screens */
+    @media (max-height: 600px) {
+      .card {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="card">
+
+    <h1>Middle Pages Calculator</h1>
+
+    <p class="subtitle">
+      Enter the length of your book and how many pages you want from the middle.
+    </p>
+
+    <label for="total">
+      Pages in the book
+    </label>
+
+    <input
+      id="total"
+      type="number"
+      inputmode="numeric"
+      min="1"
+      step="1"
+      placeholder="315"
+    >
+
+    <label for="wanted">
+      Number of middle pages
+    </label>
+
+    <input
+      id="wanted"
+      type="number"
+      inputmode="numeric"
+      min="1"
+      step="1"
+      placeholder="50"
+    >
+
+    <button onclick="calculate()">
+      Find My Pages
+    </button>
+
+    <div
+      class="error"
+      id="error"
+      role="alert"
+    ></div>
+
+    <div
+      class="result"
+      id="result"
+      aria-live="polite"
+    >
+
+      <div class="range-label">
+        Your middle pages are
+      </div>
+
+      <div
+        class="range"
+        id="range"
+      ></div>
+
+      <div
+        class="count"
+        id="count"
+      ></div>
+
+    </div>
+
+  </main>
+
+  <script>
+
+    function calculate() {
+
+      const total =
+        Number(document.getElementById("total").value);
+
+      const wanted =
+        Number(document.getElementById("wanted").value);
+
+      const result =
+        document.getElementById("result");
+
+      const error =
+        document.getElementById("error");
+
+      result.style.display = "none";
+      error.style.display = "none";
+
+      if (
+        !Number.isInteger(total) ||
+        !Number.isInteger(wanted) ||
+        total < 1 ||
+        wanted < 1
+      ) {
+
+        error.textContent =
+          "Enter whole numbers greater than zero.";
+
+        error.style.display = "block";
+        return;
+      }
+
+      if (wanted > total) {
+
+        error.textContent =
+          "The number of pages you want can't be larger than the book.";
+
+        error.style.display = "block";
+        return;
+      }
+
+      const start =
+        Math.floor((total - wanted) / 2) + 1;
+
+      const end =
+        start + wanted - 1;
+
+      document.getElementById("range").textContent =
+        `Pages ${start}–${end}`;
+
+      document.getElementById("count").textContent =
+        `${wanted.toLocaleString()} pages total`;
+
+      result.style.display = "block";
+    }
+
+
+    /*
+      Let the Enter/Go button on a phone keyboard
+      run the calculation too.
+    */
+    document.querySelectorAll("input").forEach(input => {
+
+      input.addEventListener("keydown", event => {
+
+        if (event.key === "Enter") {
+
+          calculate();
+
+          input.blur();
+
+        }
+
+      });
+
+    });
+
+  </script>
+
+</body>
+</html>
