@@ -93,6 +93,31 @@
       border-color: #386459;
     }
 
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .checkbox-row input {
+      width: 20px;
+      min-height: 20px;
+      margin: 1px 0 0;
+      flex: 0 0 20px;
+      accent-color: #386459;
+    }
+
+    .checkbox-row label {
+      display: inline;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: #4f4b44;
+    }
+
     button {
       width: 100%;
       min-height: 54px;
@@ -230,7 +255,14 @@
       min="1"
       step="1"
       value="50"
+      placeholder="50"
     >
+
+
+    <div class="checkbox-row">
+      <input id="singleSided" type="checkbox">
+      <label for="singleSided">Pages are single-sided</label>
+    </div>
 
     <button onclick="calculate()">
       Find My Pages
@@ -299,26 +331,33 @@
         return;
       }
 
-      if (wanted > total) {
+      const singleSided =
+        document.getElementById("singleSided").checked;
 
-        error.textContent =
-          "The number of pages you want can't be larger than the book.";
+      const pagesToCount = singleSided ? wanted : wanted * 2;
+
+      if (pagesToCount > total) {
+
+        error.textContent = singleSided
+          ? "The number of pages you want can't be larger than the book."
+          : "That selection is too large after accounting for double-sided pages.";
 
         error.style.display = "block";
         return;
       }
 
       const start =
-        Math.floor((total - wanted) / 2) + 1;
+        Math.floor((total - pagesToCount) / 2) + 1;
 
       const end =
-        start + wanted - 1;
+        start + pagesToCount - 1;
 
       document.getElementById("range").textContent =
         `Pages ${start}–${end}`;
 
-      document.getElementById("count").textContent =
-        `${wanted.toLocaleString()} pages total`;
+      document.getElementById("count").textContent = singleSided
+        ? `${wanted.toLocaleString()} pages total`
+        : `${wanted.toLocaleString()} double-sided pages (${pagesToCount.toLocaleString()} numbered pages)`;
 
       result.style.display = "block";
     }
